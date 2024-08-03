@@ -4,19 +4,21 @@
 #include <vector>
 #include "city.h"
 
+class City; // duvida
+
 class Path{
 private:
     double distance; 
     bool type; // True = terreste  e False = aquatico
-    City origin;
-    City destination;
+    City& origin; 
+    City& destination; // tirar duvidas sobre o uso de ponteiro e passagem por referencia
 public:
-    Path(City origin, City destination, bool type, double distance) : origin(origin), destination(destination), type(type), distance(distance){};
-    City getOrigin();
-    City getDestination();
-    double getDistance();
-    bool getType();
-    bool havePath(); // verificar
+    Path(City& origin, City& destination, bool type, double distance);
+    City& getOrigin() const;
+    City& getDestination() const;
+    double getDistance() const;
+    bool getType() const;
+    bool havePath() const; // verificar se há trajetos
 };
 
 #endif

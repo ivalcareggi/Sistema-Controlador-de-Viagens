@@ -1,25 +1,23 @@
 #ifndef CITY_H
 #define CITY_H
-#include <iostream>
+
+#include <string>
 #include <vector>
 #include "path.h"
 
+class Path; // duvida
 
-
-
-class City{
+class City {
 private:
     std::string name;
-    std::vector<Path*> paths;
+    std::vector<Path*> paths; // Trajetos conectados à cidade
 
 public:
-    City(const std::string &name) : name(name) {}
-    std::string getName();
-    void cityRegister();
-    void addPath();
-    std::vector<Path*> getPaths();
-
+    City(const std::string &name);
+    std::string getName() const;
+    void addPath(Path* path);
+    std::vector<Path*> getPaths() const;
 };
 
+#endif 
 
-#endif
