@@ -2,7 +2,7 @@
 #define PASSENGER_H
 
 #include <string>
-#include "city.h" // Incluindo o cabeçalho da classe Cidade
+#include "city.h" 
 
 class Passenger {
 private:

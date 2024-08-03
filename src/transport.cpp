@@ -1,8 +1,8 @@
 #include "transport.h"
 
 
-Transport::Transport(const std::string &name, bool type, int capacity, int speed, int rest, double timerest)
-    : name(name), type(type), capacity(capacity), speed(speed), rest(rest), timerest(timerest), available(true) {
+Transport::Transport(const std::string &name, bool type, int capacity, int speed, int distrest, double timerest)
+    : name(name), type(type), capacity(capacity), speed(speed), distrest(distrest), timerest(timerest), available(true) {
    
 }
 

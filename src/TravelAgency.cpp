@@ -107,7 +107,7 @@ void TravelAgency::printTransportReport() const {
         std::cout << "Type: " << (transport.getType() ? "Terrestre" : "Aquático") << std::endl;
         std::cout << "Capacity: " << transport.getCapacity() << std::endl;
         std::cout << "Speed: " << transport.getSpeed() << std::endl;
-        std::cout << "Rest Distance: " << transport.getRest() << std::endl;
+        std::cout << "Rest Distance: " << transport.getDistRest() << std::endl;
         std::cout << "Rest Time: " << transport.getTimerest() << std::endl;
     }
 }

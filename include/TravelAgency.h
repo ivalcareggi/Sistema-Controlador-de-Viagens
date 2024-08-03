@@ -1,5 +1,4 @@
-#ifndef CITY_H
-#define CITY_H
+
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -9,11 +8,7 @@
 #ifndef TRAVELAGENCY_H
 #define TRAVELAGENCY_H
 
-#include <iostream>
-#include <vector>
-#include "path.h"
-#include "transport.h"
-#include "passenger.h"
+
 
 
 class TravelAgency {
