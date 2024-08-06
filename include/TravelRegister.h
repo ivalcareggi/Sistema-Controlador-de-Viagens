@@ -5,20 +5,21 @@
 
 class TravelRegister {
 private:
-    TravelAgency& agency;  // Referência para a TravelAgency
+    TravelAgency& agency;  // Referência para a agência de viagens
 
 public:
-    // Construtor
+    // Construtor que inicializa a referência para a agência
     TravelRegister(TravelAgency& agency);
 
-    // Métodos para ler e registrar dados
+    // Métodos para registrar diferentes entidades
     void registerCity();
     void registerPath();
     void registerTransport();
     void registerPassenger();
 
     // Método para exibir relatórios
-    void displayReports() const;
+    void displayReports();
 };
 
 #endif // TRAVELREGISTER_H
+

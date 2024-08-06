@@ -1,30 +1,43 @@
 #ifndef TRANSPORT_H
 #define TRANSPORT_H
 
-#include <iostream>
+#include <string>
 #include <vector>
-#include "path.h"
+#include "passenger.h"
 
 class Transport {
 private:
     std::string name;
-    bool type; // True = Terrestre e False = Aquático
+    bool type;                    // Tipo do transporte (terrestre = True ou aquático = False)
     int capacity;
     int speed;
-    int distrest; // Distância entre descansos
-    double timerest; // Tempo de descanso
-    bool available; // Indica se o transporte está disponível
+    int distRest;
+    int timeRest;
+    bool available = true;
+    std::vector<Passenger> passengers; // Passageiros no transporte
 
 public:
-    Transport(const std::string &name, bool type, int capacity, int speed, int distrest, double timerest);
-    std::string getName() const;
+    Transport();  // Construtor padrão
+    Transport(const std::string& name, bool type, int capacity, int speed, int distRest, int timeRest);
+
+    const std::string& getName() const;
     bool getType() const;
     int getCapacity() const;
     int getSpeed() const;
-    int getDistRest() const; // tempo de descanso
-    double getTimerest() const; // tempo entre descansos
+    int getDistRest() const;
+    int getTimerest() const;
     bool isAvailable() const;
 
+    void setName(const std::string& name);
+    void setType(bool type);
+    void setCapacity(int capacity);
+    void setSpeed(int speed);
+    void setDistRest(int distRest);
+    void setTimerest(int timeRest);
+    void setAvailable(bool available);
+
+    void addPassenger(const Passenger& passenger);
+    void removePassenger(const Passenger& passenger);
 };
 
-#endif 
+#endif // TRANSPORT_H

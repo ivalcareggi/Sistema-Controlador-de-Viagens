@@ -1,19 +1,9 @@
 #include "city.h"
 
-// Construtor
-City::City(const std::string &name) : name(name) {}
+// Construtor da classe City
+City::City(const std::string& name) : name(name) {}
 
-
-std::string City::getName() const {
+// Retorna o nome da cidade
+const std::string& City::getName() const {
     return name;
-}
-
-
-void City::addPath(Path* path) {
-    paths.push_back(path);
-}
-
-// Retorna todos os trajetos conectados à cidade
-std::vector<Path*> City::getPaths() const {
-    return paths;
 }

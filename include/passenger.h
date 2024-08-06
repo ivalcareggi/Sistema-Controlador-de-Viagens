@@ -1,19 +1,32 @@
 #ifndef PASSENGER_H
 #define PASSENGER_H
 
+#include <iostream>
+#include "city.h"
 #include <string>
-#include "city.h" 
 
 class Passenger {
 private:
-    std::string name; // Atributo nome do passageiro
-    City* currentLocation; // Ponteiro para a cidade atual do passageiro >>> verificar/cuidar alocaçao de memoria
+    std::string name;           // Nome do passageiro
+    City* currentLocation;      // Localização atual do passageiro
 
 public:
-    Passenger(const std::string &name);
-    std::string getName() const;
-    void setName(const std::string &name);
+    // Construtor com parâmetros para inicializar os atributos
+    Passenger(const std::string& name, City* currentLocation);
+
+    // Métodos para acessar e modificar o nome do passageiro
+    const std::string& getName() const;
+    void setName(const std::string& name);
+
+    // Métodos para acessar e modificar a localização atual do passageiro
+    City* getCurrentLocation() const;
+    void setCurrentLocation(City* city);
+
+    //operador de comparaçao
+    bool operator==(const Passenger& other) const;
+
+    // Método para imprimir informações do passageiro
     void printInfo() const;
 };
 
-#endif 
+#endif // PASSENGER_H

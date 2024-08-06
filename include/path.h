@@ -1,25 +1,22 @@
 #ifndef PATH_H
 #define PATH_H
-#include <iostream>
-#include <vector>
+
 #include "city.h"
 
-class City; // duvida
-
-class Path{
+class Path {
 private:
-    double distance; 
-    bool type; // True = terreste  e False = aquatico
-    City& origin; 
-    City& destination; // tirar duvidas sobre o uso de ponteiro e passagem por referencia
+    City origin;                 // Cidade de origem do trajeto
+    City destination;            // Cidade de destino do trajeto
+    double distance;             // Distância entre as cidades de origem e destino
+
 public:
-    Path(City& origin, City& destination, bool type, double distance);
-    City& getOrigin() const;
-    City& getDestination() const;
+    // Construtor com parâmetros para inicializar os atributos
+    Path(const City& origin, const City& destination, double distance);
+
+    // Métodos para acessar os atributos
+    const City& getOrigin() const;
+    const City& getDestination() const;
     double getDistance() const;
-    bool getType() const;
-    bool havePath() const; // verificar se há trajetos
 };
 
-#endif
-
+#endif // PATH_H

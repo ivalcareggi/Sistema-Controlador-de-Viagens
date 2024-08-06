@@ -1,10 +1,11 @@
 #include <iostream>
 #include "TravelAgency.h"
 #include "TravelRegister.h"
+#include <limits>
 
 int main() {
     TravelAgency agency;
-    TravelRegister travelRegister(agency);  // Renomeado para evitar conflito
+    TravelRegister travelRegister(agency);  
 
     while (true) {
         std::cout << "\nMenu:" << std::endl;
@@ -13,7 +14,8 @@ int main() {
         std::cout << "3. Registrar Transporte" << std::endl;
         std::cout << "4. Registrar Passageiro" << std::endl;
         std::cout << "5. Exibir Relatórios" << std::endl;
-        std::cout << "6. Sair" << std::endl;
+        std::cout << "6. Iniciar Viagem" << std::endl;
+        std::cout << "7. Sair" << std::endl;
 
         int choice;
         std::cout << "Escolha uma opção: ";
@@ -22,7 +24,7 @@ int main() {
 
         switch (choice) {
         case 1:
-            travelRegister.registerCity();  // Usar o novo nome da instância
+            travelRegister.registerCity();
             break;
         case 2:
             travelRegister.registerPath();
@@ -36,7 +38,26 @@ int main() {
         case 5:
             travelRegister.displayReports();
             break;
-        case 6:
+        case 6: { // Caso para iniciar viagem
+            std::string passengerName, destinationName;
+            std::cout << "Digite o nome do passageiro: ";
+            std::getline(std::cin, passengerName);
+            std::cout << "Digite o nome da cidade de destino: ";
+            std::getline(std::cin, destinationName);
+
+            try {
+                // Encontrar o passageiro e a cidade
+                Passenger& passenger = agency.findPassenger(passengerName);
+                City& destination = agency.findCity(destinationName);
+
+                // Iniciar a viagem
+                agency.startJourney(passenger, destination);
+            } catch (const std::runtime_error& e) {
+                std::cerr << e.what() << std::endl;
+            }
+            break;
+        }
+        case 7:
             std::cout << "Encerrando o programa." << std::endl;
             return 0;
         default:
@@ -45,4 +66,3 @@ int main() {
         }
     }
 }
-

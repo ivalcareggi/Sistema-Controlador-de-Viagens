@@ -1,23 +1,18 @@
 #ifndef CITY_H
 #define CITY_H
 
-#include <string>
-#include <vector>
-#include "path.h"
-
-class Path; // duvida
+#include <iostream>
 
 class City {
 private:
-    std::string name;
-    std::vector<Path*> paths; // Trajetos conectados à cidade
+    std::string name;  // Nome da cidade
 
 public:
-    City(const std::string &name);
-    std::string getName() const;
-    void addPath(Path* path);
-    std::vector<Path*> getPaths() const;
+    // Construtor que inicializa o nome da cidade
+    City(const std::string& name);
+
+    // Método para obter o nome da cidade
+    const std::string& getName() const;
 };
 
-#endif 
-
+#endif // CITY_H
