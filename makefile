@@ -1,6 +1,7 @@
 # Definições do compilador e flags
 CXX = g++
 CXXFLAGS = -Wall -std=c++17
+LDFLAGS = -lncurses
 
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
@@ -15,7 +16,7 @@ OBJECTS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SOURCES))
 # Regra padrão: compilar o executável
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJECTS) $(LDFLAGS)
 
 # Regra para compilar arquivos .cpp em .o
 $(OBJ_DIR)/%.o: %.cpp

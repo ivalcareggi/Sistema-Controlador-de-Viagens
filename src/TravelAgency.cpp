@@ -1,6 +1,11 @@
 #include "TravelAgency.h"
 #include <iostream>
 #include <stdexcept>
+#include <map>
+#include <string>
+#include <vector>
+#include <chrono>
+#include <thread>
 
 // Construtor
 TravelAgency::TravelAgency() {}
@@ -64,6 +69,7 @@ double TravelAgency::totalTravelTime(double distance, int speed, int distRest, i
     return travelTime + restTime;
 }
 
+// Adiciona passageiro ao transporte
 void TravelAgency::addPassengerToTransport(const std::string& transportName, const Passenger& passenger) {
     auto it = transports.find(transportName);
     if (it != transports.end()) {
@@ -73,18 +79,12 @@ void TravelAgency::addPassengerToTransport(const std::string& transportName, con
     }
 }
 
-
-// Inicia uma jornada
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-
+// Inicia a viagem
 void TravelAgency::startJourney(Passenger& passenger, City& destination) {
     City* currentLocation = passenger.getCurrentLocation();
     if (!currentLocation) {
         std::cerr << "Passageiro não possui localização" << std::endl;
-        return;
+        return; 
     }
 
     // Busca o trajeto entre a localização atual e o destino
@@ -116,7 +116,7 @@ void TravelAgency::startJourney(Passenger& passenger, City& destination) {
 
             // Verificar se o transporte existe e está disponível
             if (availableTransports.find(selection) == availableTransports.end()) {
-                std::cerr << "Seleção inválida. Transporte indisponivel ou inexistente" << std::endl;
+                std::cerr << "Seleção inválida. Transporte indisponível ou inexistente." << std::endl;
                 return;
             }
 
@@ -127,18 +127,65 @@ void TravelAgency::startJourney(Passenger& passenger, City& destination) {
             selectedTransport->setAvailable(false);
             selectedTransport->addPassenger(passenger);
 
-            std::cout << "Viagem de  " << currentLocation->getName() << " para " << destination.getName() 
-                      << " usando  " << selectedTransport->getName() << std::endl;
+            std::cout << "Viagem de " << currentLocation->getName() << " para " << destination.getName() 
+                      << " usando " << selectedTransport->getName() << std::endl;
 
-            // Implemente a lógica de viagem aqui
+            int distance = path.getDistance();
+            int speed = selectedTransport->getSpeed();
+            int distRest = selectedTransport->getDistRest();
+            int timeRest = selectedTransport->getTimerest();
+
+            try {
+                // Calcular o tempo total de viagem em horas
+                double travelTime = distance / static_cast<double>(speed);
+                double restTime = (distance / static_cast<double>(distRest)) * timeRest;
+                double totalTime = travelTime + restTime;
+
+                std::cout << "Iniciando viagem, levará " << totalTime << " horas considerando o tempo de descanso." << std::endl;
+
+                int currentHour = 0;
+                double elapsedTime = 0.0;
+                while (elapsedTime < totalTime) {
+                    // Atualizar e imprimir a hora atual
+                    int hour = currentHour % 24; // Simular um relógio de 24 horas
+                    std::cout << "Hora atual: " << hour << ":00" << std::endl;
+
+                    // Solicitar avanço de tempo do usuário
+                    char userInput;
+                    std::cout << "Pressione 'a' para avançar 1 hora ou 'q' para sair: ";
+                    std::cin >> userInput;
+
+                    if (userInput == 'q') {
+                        std::cout << "Viagem interrompida pelo usuário." << std::endl;
+                        break;
+                    } else if (userInput == 'a') {
+                        elapsedTime += 1.0; // Avançar 1 hora
+                        currentHour++;
+                        if (static_cast<int>(elapsedTime) % distRest == 0) {
+                            std::cout << "Descanso por " << timeRest << " horas." << std::endl;
+                            for (int rest = 0; rest < timeRest; ++rest) {
+                                // Avançar o tempo durante o descanso
+                                std::this_thread::sleep_for(std::chrono::seconds(1));
+                                currentHour++;
+                                std::cout << "Hora de descanso: " << currentHour % 24 << ":00" << std::endl;
+                            }
+                        }
+                    } else {
+                        std::cout << "Entrada inválida. Use 'a' para avançar o tempo ou 'q' para sair." << std::endl;
+                    }
+                }
+
+                std::cout << "Viagem concluída! Chegada ao destino: " << destination.getName() << std::endl;
+
+            } catch (const std::exception& e) {
+                std::cerr << "Erro durante a viagem: " << e.what() << std::endl;
+            }
 
             return;
         }
     }
-
-    std::cerr << "Nenhum trajeeto encontrado para as cidades inseridas." << std::endl;
+    std::cerr << "Trajeto não encontrado." << std::endl;
 }
-
 
 // Imprime relatório de passageiros
 void TravelAgency::printPassengerReport() const {
@@ -158,7 +205,7 @@ void TravelAgency::printTransportReport() const {
         std::cout << "Tipo: " << (transport.getType() ? "Terrestre" : "Aquatico") << std::endl;
         std::cout << "Capacidade: " << transport.getCapacity() << std::endl;
         std::cout << "Velocidade: " << transport.getSpeed() << std::endl;
-        std::cout << "Distancia entre descansos: " << transport.getDistRest() << std::endl;
+        std::cout << "Distância entre descansos: " << transport.getDistRest() << std::endl;
         std::cout << "Tempo de descanso: " << transport.getTimerest() << std::endl;
         std::cout << "Disponível: " << (transport.isAvailable() ? "Sim" : "Não") << std::endl;
         std::cout << std::endl;
@@ -167,8 +214,8 @@ void TravelAgency::printTransportReport() const {
 
 // Imprime relatório de cidades
 void TravelAgency::printCityReport() const {
-    std::cout << "City Report:" << std::endl;
+    std::cout << "Dados das cidades:" << std::endl;
     for (const auto& city : cities) {
-        std::cout << "City: " << city.getName() << std::endl;
+        std::cout << "Cidade: " << city.getName() << std::endl;
     }
 }
