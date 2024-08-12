@@ -29,10 +29,12 @@ void TravelRegister::registerPath() {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpar buffer
 
     try {
+      
         City& origin = agency.findCity(originName);
         City& destination = agency.findCity(destinationName);
 
-        Path path(origin, destination, distance);
+       
+        Path path(&origin, &destination, distance);
         agency.addPath(path);
         std::cout << "Trajeto registrado com sucesso." << std::endl;
 
@@ -89,6 +91,25 @@ void TravelRegister::registerPassenger() {
     } catch (const std::exception& e) {
         std::cerr << "Erro ao registrar passageiro: " << e.what() << std::endl;
     }
+}
+
+// Métodos auxiliares para gerar relatórios
+void TravelRegister::printPassengerReport() const {
+    // Implementar a lógica para exibir o relatório de passageiros
+    std::cout << "Relatório de Passageiros:" << std::endl;
+   
+}
+
+void TravelRegister::printTransportReport() const {
+    // Implementar a lógica para exibir o relatório de transportes
+    std::cout << "Relatório de Transportes:" << std::endl;
+    
+}
+
+void TravelRegister::printCityReport() const {
+    // Implementar a lógica para exibir o relatório de cidades
+    std::cout << "Relatório de Cidades:" << std::endl;
+    
 }
 
 // Método para exibir relatórios

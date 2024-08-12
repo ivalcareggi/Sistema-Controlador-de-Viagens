@@ -35,6 +35,10 @@ bool Transport::isAvailable() const {
     return available;
 }
 
+City* Transport::getCurrentLocation() const {
+    return currentLocation;
+}
+
 void Transport::setName(const std::string& name) {
     this->name = name;
 }
@@ -63,6 +67,9 @@ void Transport::setAvailable(bool available) {
     this->available = available;
 }
 
+void Transport::setCurrentLocation(City* location){
+    currentLocation = location;
+}
 void Transport::addPassenger(const Passenger& passenger) {
     if (passengers.size() < static_cast<std::vector<Passenger>::size_type>(capacity)) {
         passengers.push_back(passenger);

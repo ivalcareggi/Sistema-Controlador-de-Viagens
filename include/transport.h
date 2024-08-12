@@ -15,7 +15,7 @@ private:
     int timeRest;
     bool available = true;
     std::vector<Passenger> passengers; // Passageiros no transporte
-
+    City* currentLocation;
 public:
     Transport();  // Construtor padrão
     Transport(const std::string& name, bool type, int capacity, int speed, int distRest, int timeRest);
@@ -27,7 +27,7 @@ public:
     int getDistRest() const;
     int getTimerest() const;
     bool isAvailable() const;
-
+    City* getCurrentLocation()const;
     void setName(const std::string& name);
     void setType(bool type);
     void setCapacity(int capacity);
@@ -35,7 +35,7 @@ public:
     void setDistRest(int distRest);
     void setTimerest(int timeRest);
     void setAvailable(bool available);
-
+    void setCurrentLocation(City* location);
     void addPassenger(const Passenger& passenger);
     void removePassenger(const Passenger& passenger);
 };

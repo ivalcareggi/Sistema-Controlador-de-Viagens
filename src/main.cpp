@@ -1,11 +1,14 @@
 #include <iostream>
 #include "TravelAgency.h"
 #include "TravelRegister.h"
+#include "DatabaseManager.h"
 #include <limits>
 
 int main() {
-    TravelAgency agency;
-    TravelRegister travelRegister(agency);  
+    std::string dbName = "travel_management.db";  // Nome do banco de dados
+    TravelAgency agency(dbName);  // Passa o nome do banco de dados para o construtor
+    TravelRegister travelRegister(agency);
+    DatabaseManager dbManager(dbName); // Inicializa o gerenciador de banco de dados
 
     while (true) {
         std::cout << "\nMenu:" << std::endl;
@@ -32,13 +35,41 @@ int main() {
         case 3:
             travelRegister.registerTransport();
             break;
-        case 4:
-            travelRegister.registerPassenger();
+        case 4: {
+            // Get passenger details
+            std::string passengerName;
+            std::cout << "Nome do passageiro: ";
+            std::getline(std::cin, passengerName);
+
+            std::string currentLocationName;
+            std::cout << "Localização atual: ";
+            std::getline(std::cin, currentLocationName);
+
+            // Find the current location city
+            City* currentLocation = nullptr;
+            try {
+                currentLocation = &agency.findCity(currentLocationName);
+            } catch (const std::runtime_error& e) {
+                std::cerr << e.what() << std::endl;
+                break;
+            }
+
+            // Save to database
+            if (dbManager.savePassenger(passengerName, currentLocationName)) {
+                std::cout << "Passageiro registrado no banco de dados." << std::endl;
+
+                // Add to memory
+                Passenger newPassenger(passengerName, currentLocation);
+                agency.addPassenger(newPassenger);
+            } else {
+                std::cerr << "Erro ao salvar passageiro no banco de dados." << std::endl;
+            }
             break;
+        }
         case 5:
             travelRegister.displayReports();
             break;
-        case 6: { // Caso para iniciar viagem
+        case 6: {
             std::string passengerName, destinationName;
             std::cout << "Digite o nome do passageiro: ";
             std::getline(std::cin, passengerName);
@@ -46,11 +77,8 @@ int main() {
             std::getline(std::cin, destinationName);
 
             try {
-                // Encontrar o passageiro e a cidade
                 Passenger& passenger = agency.findPassenger(passengerName);
                 City& destination = agency.findCity(destinationName);
-
-                // Iniciar a viagem
                 agency.startJourney(passenger, destination);
             } catch (const std::runtime_error& e) {
                 std::cerr << e.what() << std::endl;

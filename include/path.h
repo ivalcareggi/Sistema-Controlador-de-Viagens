@@ -1,21 +1,21 @@
 #ifndef PATH_H
 #define PATH_H
 
-#include "city.h"
+class City;  
 
 class Path {
 private:
-    City origin;                 // Cidade de origem do trajeto
-    City destination;            // Cidade de destino do trajeto
-    double distance;             // Distância entre as cidades de origem e destino
+    City* origin;               
+    City* destination;
+    double distance;
 
 public:
     // Construtor com parâmetros para inicializar os atributos
-    Path(const City& origin, const City& destination, double distance);
+    Path(City* origin, City* destination, double distance);
 
     // Métodos para acessar os atributos
-    const City& getOrigin() const;
-    const City& getDestination() const;
+    City* getOrigin() const;
+    City* getDestination() const;
     double getDistance() const;
 };
 

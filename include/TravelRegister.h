@@ -19,7 +19,11 @@ public:
 
     // Método para exibir relatórios
     void displayReports();
+    
+    // Métodos auxiliares para gerar relatórios
+    void printPassengerReport() const;
+    void printTransportReport() const;
+    void printCityReport() const;
 };
 
 #endif // TRAVELREGISTER_H
-
