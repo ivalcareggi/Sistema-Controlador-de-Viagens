@@ -1,96 +1,123 @@
 #include <iostream>
-#include "TravelAgency.h"
+#include <string>
 #include "TravelRegister.h"
-#include "DatabaseManager.h"
-#include <limits>
+
+void showMenu() {
+    std::cout << "----- Menu -----" << std::endl;
+    std::cout << "1. Adicionar Cidade" << std::endl;
+    std::cout << "2. Adicionar Transporte" << std::endl;
+    std::cout << "3. Adicionar Passageiro" << std::endl;
+    std::cout << "4. Adicionar Caminho" << std::endl;
+    std::cout << "5. Listar Cidades" << std::endl;
+    std::cout << "6. Listar Transportes" << std::endl;
+    std::cout << "7. Listar Passageiros" << std::endl;
+    std::cout << "8. Iniciar Viagem" << std::endl;
+    std::cout << "9. Sair" << std::endl;
+}
+
+void handleAddCity(TravelRegister& travelRegister) {
+    std::string cityName;
+    std::cout << "Digite o nome da cidade: ";
+    std::getline(std::cin, cityName);
+    travelRegister.addCity(cityName);
+}
+
+void handleAddTransport(TravelRegister& travelRegister) {
+    std::string transportName;
+    int capacity;
+    bool type;
+    std::cout << "Digite o nome do transporte: ";
+    std::getline(std::cin, transportName);
+    std::cout << "Digite a capacidade: ";
+    std::cin >> capacity;
+    std::cout << "Digite o tipo (1 para terrestre, 0 para aquático): ";
+    std::cin >> type;
+    std::cin.ignore();  // Limpa o caractere de nova linha
+    travelRegister.addTransport(transportName, capacity, type);
+}
+
+void handleAddPassenger(TravelRegister& travelRegister) {
+    std::string passengerName;
+    std::string location;
+    std::cout << "Digite o nome do passageiro: ";
+    std::getline(std::cin, passengerName);
+    std::cout << "Digite o nome da cidade de localização: ";
+    std::getline(std::cin, location);
+    travelRegister.addPassenger(passengerName, location);
+}
+
+void handleAddPath(TravelRegister& travelRegister) {
+    std::string origin;
+    std::string destination;
+    double distance;
+    std::cout << "Digite a cidade de origem: ";
+    std::getline(std::cin, origin);
+    std::cout << "Digite a cidade de destino: ";
+    std::getline(std::cin, destination);
+    std::cout << "Digite a distância: ";
+    std::cin >> distance;
+    std::cin.ignore();  // Limpa o caractere de nova linha
+    travelRegister.addPath(origin, destination, distance);
+}
+
+void handleListCities(const TravelRegister& travelRegister) {
+    travelRegister.listCities();
+}
+
+void handleListTransports(const DatabaseManager& dbManager) {
+    dbManager.listTransports();
+}
+
+void handleListPassengers(const DatabaseManager& dbManager) {
+    dbManager.listPassengers();
+}
 
 int main() {
-    std::string dbName = "travel_management.db";  // Nome do banco de dados
-    TravelAgency agency(dbName);  // Passa o nome do banco de dados para o construtor
-    TravelRegister travelRegister(agency);
-    DatabaseManager dbManager(dbName); // Inicializa o gerenciador de banco de dados
+    DatabaseManager dbManager("traveldata.db");
+    TravelAgency travelAgency(dbManager);
+    TravelRegister travelRegister(travelAgency, dbManager);
+
+    int choice;
 
     while (true) {
-        std::cout << "\nMenu:" << std::endl;
-        std::cout << "1. Registrar Cidade" << std::endl;
-        std::cout << "2. Registrar Trajeto" << std::endl;
-        std::cout << "3. Registrar Transporte" << std::endl;
-        std::cout << "4. Registrar Passageiro" << std::endl;
-        std::cout << "5. Exibir Relatórios" << std::endl;
-        std::cout << "6. Iniciar Viagem" << std::endl;
-        std::cout << "7. Sair" << std::endl;
-
-        int choice;
+        showMenu();
         std::cout << "Escolha uma opção: ";
         std::cin >> choice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpar buffer
+        std::cin.ignore();  // Limpa o caractere de nova linha
 
         switch (choice) {
-        case 1:
-            travelRegister.registerCity();
-            break;
-        case 2:
-            travelRegister.registerPath();
-            break;
-        case 3:
-            travelRegister.registerTransport();
-            break;
-        case 4: {
-            // Get passenger details
-            std::string passengerName;
-            std::cout << "Nome do passageiro: ";
-            std::getline(std::cin, passengerName);
-
-            std::string currentLocationName;
-            std::cout << "Localização atual: ";
-            std::getline(std::cin, currentLocationName);
-
-            // Find the current location city
-            City* currentLocation = nullptr;
-            try {
-                currentLocation = &agency.findCity(currentLocationName);
-            } catch (const std::runtime_error& e) {
-                std::cerr << e.what() << std::endl;
+            case 1:
+                handleAddCity(travelRegister);
                 break;
-            }
-
-            // Save to database
-            if (dbManager.savePassenger(passengerName, currentLocationName)) {
-                std::cout << "Passageiro registrado no banco de dados." << std::endl;
-
-                // Add to memory
-                Passenger newPassenger(passengerName, currentLocation);
-                agency.addPassenger(newPassenger);
-            } else {
-                std::cerr << "Erro ao salvar passageiro no banco de dados." << std::endl;
-            }
-            break;
-        }
-        case 5:
-            travelRegister.displayReports();
-            break;
-        case 6: {
-            std::string passengerName, destinationName;
-            std::cout << "Digite o nome do passageiro: ";
-            std::getline(std::cin, passengerName);
-            std::cout << "Digite o nome da cidade de destino: ";
-            std::getline(std::cin, destinationName);
-
-            try {
-                Passenger& passenger = agency.findPassenger(passengerName);
-                City& destination = agency.findCity(destinationName);
-                agency.startJourney(passenger, destination);
-            } catch (const std::runtime_error& e) {
-                std::cerr << e.what() << std::endl;
-            }
-            break;
-        }
-        case 7:
-            std::cout << "Encerrando o programa." << std::endl;
-            return 0;
-        default:
-            std::cout << "Escolha inválida." << std::endl;
-            break;
+            case 2:
+                handleAddTransport(travelRegister);
+                break;
+            case 3:
+                handleAddPassenger(travelRegister);
+                break;
+            case 4:
+                handleAddPath(travelRegister);
+                break;
+            case 5:
+                handleListCities(travelRegister);
+                break;
+            case 6:
+                handleListTransports(dbManager);
+                break;
+            case 7:
+                handleListPassengers(dbManager);
+                break;
+            case 8:
+                std::cout << "Funcionalidade de iniciar viagem ainda não implementada." << std::endl;
+                break;
+            case 9:
+                std::cout << "Saindo..." << std::endl;
+                return 0;
+            default:
+                std::cout << "Opção inválida. Tente novamente." << std::endl;
+                break;
         }
     }
+
+    return 0;
 }

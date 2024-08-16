@@ -3,14 +3,20 @@
 #include <iostream>
 
 Transport::Transport() 
-    : name(""), type(false), capacity(0), speed(0), distRest(0), timeRest(0) {}
+    : name(""), type(false), capacity(0), speed(0), distRest(0), timeRest(0), available(true), currentLocation(nullptr) {}
 
 Transport::Transport(const std::string& name, bool type, int capacity, int speed, int distRest, int timeRest)
-    : name(name), type(type), capacity(capacity), speed(speed), distRest(distRest), timeRest(timeRest), available(true) {}
+    : name(name), type(type), capacity(capacity), speed(speed), distRest(distRest), timeRest(timeRest), available(true), currentLocation(nullptr) {}
 
+
+
+Transport::Transport(int id, const std::string& name, bool type, int capacity)
+    : name(name), type(type), capacity(capacity), speed(0), distRest(0), timeRest(0), available(true), id(id), currentLocation(nullptr) {
+}
 const std::string& Transport::getName() const {
     return name;
 }
+
 bool Transport::getType() const {
     return type;
 }
@@ -35,9 +41,18 @@ bool Transport::isAvailable() const {
     return available;
 }
 
+bool Transport::isInTransit()const{
+    return inTransit;
+}
+
 City* Transport::getCurrentLocation() const {
     return currentLocation;
 }
+
+int Transport::getCurrentOccupancy() const {
+    return occupancy;
+}
+
 
 void Transport::setName(const std::string& name) {
     this->name = name;
@@ -67,18 +82,23 @@ void Transport::setAvailable(bool available) {
     this->available = available;
 }
 
-void Transport::setCurrentLocation(City* location){
-    currentLocation = location;
-}
-void Transport::addPassenger(const Passenger& passenger) {
-    if (passengers.size() < static_cast<std::vector<Passenger>::size_type>(capacity)) {
-        passengers.push_back(passenger);
-    } else {
-        std::cout << "Transporte lotado, tente novamente!" << std::endl;
-    }
+void Transport::setInTransit(bool inTransit){
+    this->inTransit = inTransit;
 }
 
+void Transport::setCurrentLocation(City* location) {
+    currentLocation = location;
+}
+
+void Transport::addPassenger(const Passenger& passenger) {
+    if (occupancy < capacity) {
+        passengers.push_back(passenger);
+        ++occupancy;  // Atualizar a ocupação após adicionar o passageiro
+    }
+}
 void Transport::removePassenger(const Passenger& passenger) {
     auto it = std::remove(passengers.begin(), passengers.end(), passenger);
-    passengers.erase(it, passengers.end());
+    if (it != passengers.end()) {
+        passengers.erase(it, passengers.end());
+    }
 }

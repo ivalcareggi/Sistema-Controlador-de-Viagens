@@ -1,22 +1,26 @@
 #ifndef PATH_H
 #define PATH_H
 
-class City;  
+class City;
 
 class Path {
 private:
-    City* origin;               
-    City* destination;
-    double distance;
+    City* origin;               // Ponteiro para a cidade de origem
+    City* destination;          // Ponteiro para a cidade de destino
+    double distance;            // Distância do caminho
 
 public:
-    // Construtor com parâmetros para inicializar os atributos
+    // Construtor
     Path(City* origin, City* destination, double distance);
 
-    // Métodos para acessar os atributos
+    // Métodos getters
     City* getOrigin() const;
     City* getDestination() const;
     double getDistance() const;
+
+    // Definição do operador de comparação ==
+    bool operator==(const Path& other) const;
 };
 
 #endif // PATH_H
+

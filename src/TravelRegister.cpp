@@ -1,142 +1,134 @@
 #include "TravelRegister.h"
 #include <iostream>
-#include <string>
-#include <limits>
+#include <stdexcept>
 
-// Construtor que inicializa a referência para a agência
-TravelRegister::TravelRegister(TravelAgency& agency) : agency(agency) {}
+// Construtor
+TravelRegister::TravelRegister(TravelAgency& agency, DatabaseManager& dbManager)
+    : agency(agency), dbManager(dbManager) {}
 
-// Método para registrar uma cidade
+// Método para registrar cidades
 void TravelRegister::registerCity() {
-    std::string name;
-    std::cout << "Digite o nome da cidade: ";
-    std::getline(std::cin, name);
-    City city(name);
-    agency.addCity(city);
-    std::cout << "Cidade registrada com sucesso." << std::endl;
-}
-
-// Método para registrar um trajeto
-void TravelRegister::registerPath() {
-    std::string originName, destinationName;
-    double distance;
-    std::cout << "Digite o nome da cidade de origem: ";
-    std::getline(std::cin, originName);
-    std::cout << "Digite o nome da cidade de destino: ";
-    std::getline(std::cin, destinationName);
-    std::cout << "Digite a distância entre as cidades: ";
-    std::cin >> distance;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpar buffer
-
-    try {
-      
-        City& origin = agency.findCity(originName);
-        City& destination = agency.findCity(destinationName);
-
-       
-        Path path(&origin, &destination, distance);
-        agency.addPath(path);
-        std::cout << "Trajeto registrado com sucesso." << std::endl;
-
-    } catch (const std::runtime_error& e) {
-        std::cerr << e.what() << std::endl;
-    }
-}
-
-// Método para registrar um transporte
-void TravelRegister::registerTransport() {
-    std::string name;
-    int type, capacity, speed, distRest, timeRest;
-    std::cout << "Digite o nome do transporte: ";
-    std::getline(std::cin, name);
-    std::cout << "Digite o tipo do transporte (0 para aquático, 1 para terrestre): ";
-    std::cin >> type;
-    std::cout << "Digite a capacidade do transporte: ";
-    std::cin >> capacity;
-    std::cout << "Digite a velocidade do transporte: ";
-    std::cin >> speed;
-    std::cout << "Digite a distância para descanso: ";
-    std::cin >> distRest;
-    std::cout << "Digite o tempo de descanso: ";
-    std::cin >> timeRest;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpar buffer
-
-    Transport transport(name, type, capacity, speed, distRest, timeRest);
-    agency.addTransport(transport);
-    std::cout << "Transporte registrado com sucesso." << std::endl;
-}
-
-// Método para registrar um passageiro
-void TravelRegister::registerPassenger() {
-    std::string name, cityName;
-    std::cout << "Digite o nome do passageiro: ";
-    std::getline(std::cin, name);
-    std::cout << "Digite a cidade atual do passageiro: ";
+    std::string cityName;
+    std::cout << "Enter city name: ";
     std::getline(std::cin, cityName);
-
-    try {
-        City* currentLocation = nullptr;
-        if (!cityName.empty()) {
-            try {
-                currentLocation = &agency.findCity(cityName);
-            } catch (const std::runtime_error& e) {
-                std::cerr << e.what() << std::endl;
-            }
-        }
-
-        Passenger passenger(name, currentLocation);
-        agency.addPassenger(passenger);
-        std::cout << "Passageiro registrado com sucesso." << std::endl;
-
-    } catch (const std::exception& e) {
-        std::cerr << "Erro ao registrar passageiro: " << e.what() << std::endl;
-    }
+    addCity(cityName);
 }
 
-// Métodos auxiliares para gerar relatórios
-void TravelRegister::printPassengerReport() const {
-    // Implementar a lógica para exibir o relatório de passageiros
-    std::cout << "Relatório de Passageiros:" << std::endl;
-   
+// Método para registrar caminhos
+void TravelRegister::registerPath() {
+    std::string origin, destination;
+    double distance;
+    std::cout << "Enter origin city name: ";
+    std::getline(std::cin, origin);
+    std::cout << "Enter destination city name: ";
+    std::getline(std::cin, destination);
+    std::cout << "Enter distance: ";
+    std::cin >> distance;
+    std::cin.ignore();  // Clear newline character left in the input buffer
+    addPath(origin, destination, distance);
 }
 
-void TravelRegister::printTransportReport() const {
-    // Implementar a lógica para exibir o relatório de transportes
-    std::cout << "Relatório de Transportes:" << std::endl;
-    
+// Método para registrar transportes
+void TravelRegister::registerTransport() {
+    std::string transportName;
+    int capacity;
+    bool type;
+    std::cout << "Enter transport name: ";
+    std::getline(std::cin, transportName);
+    std::cout << "Enter capacity: ";
+    std::cin >> capacity;
+    std::cout << "Enter type (1 for terrestrial, 0 for aquatic): ";
+    std::cin >> type;
+    std::cin.ignore();  // Clear newline character left in the input buffer
+    addTransport(transportName, capacity, type);
 }
 
-void TravelRegister::printCityReport() const {
-    // Implementar a lógica para exibir o relatório de cidades
-    std::cout << "Relatório de Cidades:" << std::endl;
-    
+// Método para registrar passageiros
+void TravelRegister::registerPassenger() {
+    std::string passengerName, location;
+    std::cout << "Enter passenger name: ";
+    std::getline(std::cin, passengerName);
+    std::cout << "Enter location city name: ";
+    std::getline(std::cin, location);
+    addPassenger(passengerName, location);
 }
 
-// Método para exibir relatórios
+// Adiciona uma cidade ao banco de dados
+void TravelRegister::addCity(const std::string& cityName) {
+    dbManager.saveCity(cityName);
+}
+
+// Adiciona um transporte ao banco de dados
+void TravelRegister::addTransport(const std::string& transportName, int capacity, bool type) {
+    dbManager.saveTransport(transportName, capacity, type);
+}
+
+// Adiciona um passageiro ao banco de dados
+void TravelRegister::addPassenger(const std::string& passengerName, const std::string& location) {
+    dbManager.savePassenger(passengerName, location);
+}
+
+// Adiciona um caminho ao banco de dados
+void TravelRegister::addPath(const std::string& origin, const std::string& destination, double distance) {
+    dbManager.savePath(origin, destination, distance);
+}
+
+// Busca uma cidade pelo nome
+City TravelRegister::findCityByName(const std::string& cityName) {
+    return dbManager.findCityByName(cityName);
+}
+
+// Exibe relatórios
 void TravelRegister::displayReports() {
-    std::cout << "\nRelatórios Disponíveis:" << std::endl;
-    std::cout << "1. Relatório de Passageiros" << std::endl;
-    std::cout << "2. Relatório de Transportes" << std::endl;
-    std::cout << "3. Relatório de Cidades" << std::endl;
+    printPassengerReport();
+    printTransportReport();
+    printCityReport();
+}
 
-    int choice;
-    std::cout << "Escolha uma opção: ";
-    std::cin >> choice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpar buffer
+// Imprime o relatório de passageiros
+void TravelRegister::printPassengerReport() const {
+    std::cout << "Passenger Report:\n";
+    dbManager.listPassengers(); 
+}
 
-    switch (choice) {
-    case 1:
-        agency.printPassengerReport();
-        break;
-    case 2:
-        agency.printTransportReport();
-        break;
-    case 3:
-        agency.printCityReport();
-        break;
-    default:
-        std::cout << "Opção inválida." << std::endl;
-        break;
+// Imprime o relatório de transportes
+void TravelRegister::printTransportReport() const {
+    std::vector<Transport> transports = dbManager.getAllTransports();
+    std::cout << "Transport Report:\n";
+    for (const auto& transport : transports) {
+        std::cout << "Name: " << transport.getName() << ", Capacity: " << transport.getCapacity() << ", Type: " << (transport.getType() ? "Terrestrial" : "Aquatic") << "\n";
     }
 }
 
+// Imprime o relatório de cidades
+void TravelRegister::printCityReport() const {
+    std::vector<City> cities = dbManager.getAllCities();
+    std::cout << "City Report:\n";
+    for (const auto& city : cities) {
+        std::cout << "ID: " << city.getId() << ", Name: " << city.getName() << "\n";
+    }
+}
+
+// Lista todas as cidades
+void TravelRegister::listCities() const {
+    std::vector<std::string> cityNames = dbManager.getAllCityNames();
+    std::cout << "List of Cities:\n";
+    for (const auto& name : cityNames) {
+        std::cout << name << "\n";
+    }
+}
+
+// Carrega as cidades do banco de dados
+void TravelRegister::loadCitiesFromDatabase() {
+    std::vector<City> cities = dbManager.getAllCities();
+    for (const auto& city : cities) {
+        
+         agency.addCity(city); 
+    }
+}
+
+// Obtém a lista de passageiros
+std::vector<Passenger>& TravelRegister::getPassengers() {
+    
+    return agency.getPassengers();
+}
