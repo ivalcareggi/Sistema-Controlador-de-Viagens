@@ -5,11 +5,11 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "city.h"
-#include "transport.h"
-#include "passenger.h"
-#include "path.h"
-#include "DatabaseManager.h"
+#include "../include/city.h"
+#include "../include/transport.h"
+#include "../include/passenger.h"
+#include "../include/path.h"
+#include "../include/DatabaseManager.h"
 
 class TravelArithmetic {
 public:

@@ -1,4 +1,4 @@
-#include "passenger.h"
+#include "../include/passenger.h"
 #include <iostream>
 
 // Construtor padrão

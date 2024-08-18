@@ -1,5 +1,5 @@
-#include "path.h"
-#include "city.h"
+#include "../include/path.h"
+#include "../include/city.h"
 
 // Construtor
 Path::Path(City* origin, City* destination, double distance)

@@ -3,8 +3,8 @@
 
 #include <string>
 #include <vector>
-#include "TravelAgency.h"
-#include "DatabaseManager.h"
+#include "../include/TravelAgency.h"
+#include "../include/DatabaseManager.h"
 
 class TravelRegister {
 private:

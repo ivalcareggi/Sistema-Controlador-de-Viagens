@@ -1,12 +1,12 @@
 #ifndef TRAVELAGENCY_H
 #define TRAVELAGENCY_H
 
-#include "DatabaseManager.h"
-#include "TravelArithmetic.h"
-#include "city.h"
-#include "path.h"
-#include "transport.h"
-#include "passenger.h"
+#include "../include/DatabaseManager.h"
+#include "../include/TravelArithmetic.h"
+#include "../include/city.h"
+#include "../include/path.h"
+#include "../include/transport.h"
+#include "../include/passenger.h"
 
 #include <string>
 #include <vector>
