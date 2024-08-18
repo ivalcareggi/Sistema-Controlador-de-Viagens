@@ -1,7 +1,7 @@
 #include "../include/TravelRegister.h"
 #include <iostream>
 #include <stdexcept>
-
+#include <algorithm>
 // Construtor
 TravelRegister::TravelRegister(TravelAgency& agency, DatabaseManager& dbManager)
     : agency(agency), dbManager(dbManager) {}
@@ -74,7 +74,7 @@ void TravelRegister::addPath(const std::string& origin, const std::string& desti
 }
 
 // Busca uma cidade pelo nome
-City TravelRegister::findCityByName(const std::string& cityName) {
+City* TravelRegister::findCityByName(const std::string& cityName) {
     return dbManager.findCityByName(cityName);
 }
 
@@ -131,4 +131,16 @@ void TravelRegister::loadCitiesFromDatabase() {
 std::vector<Passenger>& TravelRegister::getPassengers() {
     
     return agency.getPassengers();
+}
+
+DatabaseManager& TravelRegister::getDatabaseManager() const {
+    return dbManager;
+}
+
+Passenger* TravelRegister::findPassengerByName(const std::string& passengerName) {
+    std::string name = dbManager.getPassengerName(passengerName);
+    if (name.empty()) {
+        return nullptr;  // Passageiro não encontrado
+    }
+    return new Passenger(name);  // Retorna um novo objeto Passenger
 }

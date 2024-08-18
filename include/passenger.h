@@ -15,7 +15,8 @@ public:
     // Construtor com parâmetros para inicializar os atributos
     Passenger();  // Construtor padrão
     Passenger(const std::string& name, City* currentLocation);
-    Passenger(const std::string& name, City& currentLocation); // Novo construtor
+    Passenger(const std::string& name, City& currentLocation); 
+    Passenger(const std::string& name);
 
     // Métodos para acessar e modificar o nome do passageiro
     const std::string& getName() const;

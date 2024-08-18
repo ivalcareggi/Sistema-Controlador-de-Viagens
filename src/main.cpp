@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include "../include/TravelRegister.h"
 
 void showMenu() {
@@ -11,7 +12,7 @@ void showMenu() {
     std::cout << "5. Listar Cidades" << std::endl;
     std::cout << "6. Listar Transportes" << std::endl;
     std::cout << "7. Listar Passageiros" << std::endl;
-    std::cout << "8. Iniciar Viagem" << std::endl;
+    std::cout << "8. Iniciar Viagem" << std::endl;  // Modificação aqui
     std::cout << "9. Sair" << std::endl;
 }
 
@@ -72,6 +73,36 @@ void handleListPassengers(const DatabaseManager& dbManager) {
     dbManager.listPassengers();
 }
 
+void handleStartJourney(TravelRegister& travelRegister, TravelAgency& travelAgency) {
+    std::string passengerName;
+    std::string destinationName;
+
+    std::cout << "Digite o nome do passageiro: ";
+    std::getline(std::cin, passengerName);
+
+    std::cout << "Digite o nome da cidade de destino: ";
+    std::getline(std::cin, destinationName);
+
+    // Verifica se o passageiro existe no banco de dados
+    Passenger* passenger = travelRegister.findPassengerByName(passengerName);
+    if (!passenger) {
+        std::cout << "Passageiro não encontrado no banco de dados.\n";
+        return;
+    }
+
+    // Verifica se a cidade de destino existe no banco de dados
+    City* destinationCity = travelRegister.findCityByName(destinationName);
+    if (!destinationCity) {
+        std::cout << "Cidade de destino não encontrada.\n";
+        return;
+    }
+
+    // Inicia a viagem
+    travelAgency.startJourney(*passenger, destinationName);
+}
+
+
+
 int main() {
     DatabaseManager dbManager("traveldata.db");
     TravelAgency travelAgency(dbManager);
@@ -108,7 +139,7 @@ int main() {
                 handleListPassengers(dbManager);
                 break;
             case 8:
-                std::cout << "Funcionalidade de iniciar viagem ainda não implementada." << std::endl;
+                handleStartJourney(travelRegister, travelAgency);  // Adiciona a funcionalidade de iniciar viagem
                 break;
             case 9:
                 std::cout << "Saindo..." << std::endl;

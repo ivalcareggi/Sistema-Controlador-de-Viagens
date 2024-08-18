@@ -67,7 +67,7 @@ void TravelAgency::updatePassengerLocation(Passenger& passenger, City* newLocati
         passenger.setCurrentLocation(newLocation);
 
         // Atualiza a localização no banco de dados
-       // dbManager.updatePassengerLocation(passenger.getName(), newLocation->getId());
+        dbManager.updatePassengerLocation(passenger.getName(), newLocation->getId());
     }
 }
 

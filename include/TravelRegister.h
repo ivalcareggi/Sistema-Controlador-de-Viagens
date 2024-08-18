@@ -1,3 +1,5 @@
+// TravelRegister.h
+
 #ifndef TRAVELREGISTER_H
 #define TRAVELREGISTER_H
 
@@ -28,7 +30,8 @@ public:
     void addPath(const std::string& origin, const std::string& destination, double distance);
 
     // Métodos de busca
-    City findCityByName(const std::string& cityName);
+    City* findCityByName(const std::string& cityName);
+    Passenger* findPassengerByName(const std::string& passengerName);
 
     // Método para exibir relatórios
     void displayReports();
@@ -42,6 +45,7 @@ public:
     // Métodos de carregamento
     void loadCitiesFromDatabase(); 
     std::vector<Passenger>& getPassengers();  
+    DatabaseManager& getDatabaseManager() const;
 };
 
 #endif // TRAVELREGISTER_H

@@ -4,6 +4,7 @@
 // Construtor padrão
 Passenger::Passenger() : name(""), currentLocation(nullptr) {}
 
+
 // Construtor com nome e ponteiro para a cidade
 Passenger::Passenger(const std::string& name, City* currentLocation)
     : name(name), currentLocation(currentLocation) {}
@@ -11,6 +12,8 @@ Passenger::Passenger(const std::string& name, City* currentLocation)
 // Construtor com nome e referência para a cidade
 Passenger::Passenger(const std::string& name, City& currentLocation)
     : name(name), currentLocation(&currentLocation) {}
+
+Passenger::Passenger(const std::string& name) : name(name), currentLocation(nullptr) {}
 
 // Retorna o nome do passageiro
 const std::string& Passenger::getName() const {

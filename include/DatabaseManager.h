@@ -7,7 +7,7 @@
 #include "city.h"
 #include "transport.h"
 #include "path.h"
-#include "TravelAgency.h"
+
 
 class DatabaseManager {
 public:
@@ -21,6 +21,7 @@ public:
     void savePassenger(const std::string& passengerName, const std::string& location); // continuar amanha
     void saveTravel(int transportId, int originCityId, int destinationCityId, const std::string& timestamp);
     void updateTravelEndTime(int travelId, const std::string& endTime);
+    void updatePassengerLocation(const std::string& name, int id);
 
     // Métodos de listagem
     void listCities() const;
@@ -38,6 +39,7 @@ public:
     double getPathDistance(int originCityId, int destinationCityId); 
     int getTransportId(const std::string& transportName); 
     int getCityId(const std::string& cityName) const;
+    std::string getPassengerName(const std::string& passengerName);
 
 private:
     sqlite3* db;

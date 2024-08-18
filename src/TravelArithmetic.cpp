@@ -1,4 +1,4 @@
-#include "TravelArithmetic.h"
+#include "../include/TravelArithmetic.h"
 #include <iostream>
 #include <stdexcept>
 #include <limits>

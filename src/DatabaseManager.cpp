@@ -341,7 +341,6 @@ City* DatabaseManager::findCityByName(const std::string& cityName) {
 
     City* city = nullptr;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        int id = sqlite3_column_int(stmt, 0);
         std::string name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
 
         // Cria um novo objeto City com os dados retornados
@@ -557,4 +556,33 @@ int DatabaseManager::getCityId(const std::string& cityName) const {  // procura 
     }
 
     return cityId;
+}
+
+void DatabaseManager::updatePassengerLocation(const std::string& name, int id) {
+    std::stringstream sql;
+
+    sql << "UPDATE travel_passengers as pas SET pas.city_id = " << id << "WHERE pas.name = '" << name << "';";
+
+    executeSQL(sql.str());
+
+}
+
+std::string DatabaseManager::getPassengerName(const std::string& passengerName) {
+    sqlite3_stmt* stmt;
+    std::string query = "SELECT name FROM passengers WHERE name = ?";
+    std::string result;
+
+    if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, passengerName.c_str(), -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            result = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        }
+
+        sqlite3_finalize(stmt);
+    } else {
+        std::cerr << "Error preparing SQL statement." << std::endl;
+    }
+
+    return result;
 }
