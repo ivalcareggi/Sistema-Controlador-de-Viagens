@@ -34,3 +34,4 @@ const Path* City::findPathTo(City* destination) const {
     }
     return nullptr;
 }
+

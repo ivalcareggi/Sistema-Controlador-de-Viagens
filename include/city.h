@@ -20,6 +20,8 @@ public:
     // Métodos getter
     int getId() const;
     const std::string& getName() const;
+
+   
     
     void addPath(const Path& path);
     const std::vector<Path>& getPaths() const;

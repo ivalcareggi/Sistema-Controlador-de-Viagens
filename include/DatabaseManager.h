@@ -7,6 +7,7 @@
 #include "city.h"
 #include "transport.h"
 #include "path.h"
+#include "TravelAgency.h"
 
 class DatabaseManager {
 public:
@@ -28,7 +29,7 @@ public:
     void listPaths() const;
 
     // Métodos de consulta
-    City findCityByName(const std::string& cityName);
+    City* findCityByName(const std::string& cityName);
     std::vector<std::string> getAllCityNames();
     std::vector<City> getAllCities(); 
     std::vector<Transport> getAllTransports(); 

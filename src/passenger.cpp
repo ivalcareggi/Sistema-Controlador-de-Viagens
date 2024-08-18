@@ -47,3 +47,12 @@ bool Passenger::operator==(const Passenger& other) const {
     return this->name == other.name &&
            this->currentLocation == other.currentLocation;
 }
+
+
+bool Passenger::isOnRoute(bool onRoute) const {
+    return onRoute;
+}
+
+void Passenger::setPassengerOnRoute(bool onRoute){
+    this->onRoute = onRoute;
+}

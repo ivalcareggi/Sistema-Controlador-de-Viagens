@@ -53,6 +53,9 @@ int Transport::getCurrentOccupancy() const {
     return occupancy;
 }
 
+int Transport::getId() const {
+    return id;
+}
 
 void Transport::setName(const std::string& name) {
     this->name = name;

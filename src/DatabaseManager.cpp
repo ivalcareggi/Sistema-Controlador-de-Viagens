@@ -64,19 +64,31 @@ void DatabaseManager::createTables() {
             transport_id INTEGER NOT NULL,
             origin_id INTEGER NOT NULL,
             destination_id INTEGER NOT NULL,
-            start_time TEXT NOT NULL,
-            end_time TEXT,
+            start_time TIMESTAMP,
+            end_time TIMESTAMP,
             FOREIGN KEY (transport_id) REFERENCES transports(id),
             FOREIGN KEY (origin_id) REFERENCES cities(id),
             FOREIGN KEY (destination_id) REFERENCES cities(id)
         );
     )";
 
+    std::string createTripLogsTable = R"(
+        CREATE TABLE IF NOT EXISTS trip_logs (                                                          
+            log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            travel_id INTEGER NOT NULL,
+            destination_id INTEGER NOT NULL,
+            passengers TEXT NOT NULL,
+            trip_status TEXT NOT NULL,
+            FOREIGN KEY (travel_id) REFERENCES travels(id),
+            FOREIGN KEY (destination_id) REFERENCES cities(id)
+    );
+)";
     executeSQL(createCitiesTable);
     executeSQL(createTransportsTable);
     executeSQL(createPassengersTable);
     executeSQL(createPathsTable);
     executeSQL(createTravelsTable);
+    executeSQL(createTripLogsTable); // verificar 
 }
 
 void DatabaseManager::executeSQL(const std::string& sql) {
@@ -106,8 +118,7 @@ void DatabaseManager::saveCity(const std::string& cityName) {
     }
 }
 
-#include "DatabaseManager.h"
-#include <sstream>
+
 
 void DatabaseManager::savePath(const std::string& origin, const std::string& destination, double distance) {
     std::stringstream sql;
@@ -311,32 +322,38 @@ void DatabaseManager::listPaths() const {
     sqlite3_finalize(stmt);
 }
 
-City DatabaseManager::findCityByName(const std::string& cityName) {
+City* DatabaseManager::findCityByName(const std::string& cityName) {
     sqlite3_stmt* stmt;
     const std::string query = "SELECT id, name FROM cities WHERE name = ?;";
 
-    // Prepare the SQL statement
+    // Prepara a instrução SQL
     if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
-        return City(""); // Retorna uma cidade com nome vazio em caso de erro
+        std::cerr << "Falha ao preparar a instrução: " << sqlite3_errmsg(db) << std::endl;
+        return nullptr; // Retorna nullptr em caso de erro
     }
 
-    
-    sqlite3_bind_text(stmt, 1, cityName.c_str(), -1, SQLITE_TRANSIENT);
+    // Vincula o parâmetro
+    if (sqlite3_bind_text(stmt, 1, cityName.c_str(), -1, SQLITE_STATIC) != SQLITE_OK) {
+        std::cerr << "Falha ao vincular o parâmetro: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return nullptr;
+    }
 
-    City result(""); // Cidade padrão em caso de não encontrar
+    City* city = nullptr;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         int id = sqlite3_column_int(stmt, 0);
-        const unsigned char* nameText = sqlite3_column_text(stmt, 1);
-        std::string name(reinterpret_cast<const char*>(nameText));
+        std::string name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
 
-        result = City(id, name);
+        // Cria um novo objeto City com os dados retornados
+        city = new City(name); // Aqui você pode precisar ajustar a construção dependendo de como a classe City é definida
+        //city->setId(id); // Se você tem um método para definir o ID na classe City
+    } else {
+        std::cerr << "Cidade não encontrada" << std::endl;
     }
 
-   
+    // Finaliza a instrução
     sqlite3_finalize(stmt);
-
-    return result;
+    return city; // Retorna o ponteiro para a cidade encontrada ou nullptr se não encontrada
 }
 
 std::vector<std::string> DatabaseManager::getAllCityNames() {

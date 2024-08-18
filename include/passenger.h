@@ -9,6 +9,7 @@ class Passenger {
 private:
     std::string name;           // Nome do passageiro
     City* currentLocation;      // Localização atual do passageiro
+    bool onRoute = false;       // Inicia como false até iniciar uma viagem
 
 public:
     // Construtor com parâmetros para inicializar os atributos
@@ -29,6 +30,11 @@ public:
 
     // Método para imprimir informações do passageiro
     void printInfo() const;
+
+    // Método para atualizar estado do passageiro
+
+    bool isOnRoute(bool onRoute) const;
+    void setPassengerOnRoute(bool onRoute);
 };
 
 #endif // PASSENGER_H

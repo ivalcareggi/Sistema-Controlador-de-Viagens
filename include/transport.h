@@ -36,6 +36,7 @@ public:
     bool isAvailable() const;
     bool isInTransit()const;
     City* getCurrentLocation() const;
+    int getId() const; 
     void setName(const std::string& name);
     void setType(bool type);
     void setCapacity(int capacity);

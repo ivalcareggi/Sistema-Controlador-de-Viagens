@@ -7,6 +7,11 @@
 #include <map>
 #include <set>
 
+
+TravelArithmetic::TravelArithmetic() {
+    // Se necessário, adicione código de inicialização aqui
+}
+
 // Calcula o tempo total de viagem, considerando pausas
 double TravelArithmetic::totalTravelTime(double distance, int speed, int distRest, int timeRest) const {
     if (speed <= 0) {
