@@ -120,10 +120,18 @@ void DatabaseManager::saveCity(const std::string& cityName) {
 
 
 void DatabaseManager::savePath(const std::string& origin, const std::string& destination, double distance) {
+    int originId = getCityId(origin);
+    int destinationId = getCityId(destination);
+
+    if (originId == -1 || destinationId == -1) {
+        std::cerr << "Erro ao encontrar IDs das cidades: " << origin << " e " << destination << std::endl;
+        return;
+    }
+
     std::stringstream sql;
-    sql << "INSERT INTO travel_routes (origin_id, destination_id, distance) VALUES ('"
-        << origin << "', '"
-        << destination << "', "
+    sql << "INSERT INTO travel_routes (origin_id, destination_id, distance) VALUES ("
+        << originId << ", "
+        << destinationId << ", "
         << distance << ");";
 
     std::string query = sql.str();
@@ -132,22 +140,17 @@ void DatabaseManager::savePath(const std::string& origin, const std::string& des
 }
 
 void DatabaseManager::saveTransport(const std::string& transportName, int capacity, bool type) {
-    std::string sql = "INSERT INTO transports (name, capacity, type) VALUES (?, ?, ?);";
-    sqlite3_stmt* stmt;
+    // Cria a string SQL para inserir um novo transporte na tabela
+    std::stringstream sql;
+    sql << "INSERT INTO transports (name, capacity, type) VALUES ('"
+        << transportName << "', "
+        << capacity << ", "
+        << (type ? 1 : 0) << ");";  // Assuming 'type' is stored as an integer: 1 (true) or 0 (false)
 
-    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
-        sqlite3_bind_text(stmt, 1, transportName.c_str(), -1, SQLITE_TRANSIENT);
-        sqlite3_bind_int(stmt, 2, capacity);
-        sqlite3_bind_int(stmt, 3, type ? 1 : 0);
-        if (sqlite3_step(stmt) != SQLITE_DONE) {
-            std::cerr << "Error saving transport: " << sqlite3_errmsg(db) << std::endl;
-        }
-        sqlite3_finalize(stmt);
-    } else {
-        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
-    }
+    // Converte o stringstream em string e executa o SQL
+    std::string query = sql.str();
+    executeSQL(query);
 }
-
 void DatabaseManager::savePassenger(const std::string& passengerName, const std::string& location) {
     int cityId = getCityId(location);
 
