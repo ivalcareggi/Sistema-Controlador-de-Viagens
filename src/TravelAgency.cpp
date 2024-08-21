@@ -28,36 +28,37 @@ std::string getCurrentTimestamp() {
     ss << std::put_time(&now_tm, "%Y-%m-%d %H:%M:%S");
     return ss.str();
 }
-
-void TravelAgency::addPassengerToTransport(const std::string& transportName, const Passenger& passenger) {
+void TravelAgency::addPassengerToTransport(std::string& transportName, const Passenger& passenger) {
     // Exibir a lista de transportes disponíveis
+    std::vector<Transport> transportsList = dbManager.getAllTransports(); // Certifique-se de ter implementado este método
     std::cout << "Transportes disponíveis:\n";
-    for (const auto& transportPair : transports) {
-        const Transport& transport = transportPair.second;
-        std::cout << "Nome: " << transportPair.first 
+    for (const auto& transport : transportsList) {
+        std::cout << "Nome: " << transport.getName() 
                   << " (Capacidade: " << transport.getCapacity() << ")\n";
     }
 
     // Solicitar ao usuário que selecione um transporte
-    std::string selectedTransportName;
     std::cout << "Digite o nome do transporte desejado: ";
-    std::cin >> selectedTransportName;
+    std::cin >> transportName;
 
-    // Verificar se o transporte existe
-    auto it = transports.find(selectedTransportName);
-    if (it != transports.end()) {
-        Transport& selectedTransport = it->second;
+    // Buscar o transporte pelo nome no banco de dados
+    Transport selectedTransport = dbManager.getTransportByName(transportName);
 
+    if (!selectedTransport.getName().empty()) { // Verifica se o transporte foi encontrado
         // Verificar se há capacidade disponível
         if (selectedTransport.getCurrentOccupancy() < selectedTransport.getCapacity()) {
             // Adicionar o passageiro ao transporte
             selectedTransport.addPassenger(passenger);
-            std::cout << "Passageiro adicionado ao transporte " << selectedTransportName << ".\n";
+            std::cout << "Passageiro adicionado ao transporte " << transportName << ".\n";
+
+            // Atualizar o map de transportes na TravelAgency
+            transports[transportName] = selectedTransport;
         } else {
             std::cout << "O transporte está cheio. Não é possível adicionar mais passageiros.\n";
         }
     } else {
         std::cout << "Transporte não encontrado.\n";
+        transportName.clear(); // Limpar o nome do transporte para indicar falha
     }
 }
 
@@ -75,6 +76,8 @@ void TravelAgency::startJourney(Passenger& passenger, const std::string& destina
     City* currentLocation = passenger.getCurrentLocation();
     if (!currentLocation) {
         std::cerr << "Passageiro não possui localização" << std::endl;
+        std::cout << "AAAAAAAAAAAAAAAAAA" << std::endl;
+        std::cout << "Nome do Passageiro: " << passenger.getName() << std::endl;
         return;
     }
 
@@ -86,10 +89,10 @@ void TravelAgency::startJourney(Passenger& passenger, const std::string& destina
     }
 
     // Calcula a melhor rota usando TravelArithmetic
-    std::vector<City*> shortestPath = travelArithmetic.calculateShortestPath(*currentLocation, *destinationCity, cities);
-
+   // std::vector<City*> shortestPath = travelArithmetic.calculateShortestPath(*currentLocation, *destinationCity, cities);
+  // double totalDistance = 0.0;
     // Calcula a distância total da rota
-    double totalDistance = 0.0;
+/*    double totalDistance = 0.0;
     for (size_t i = 0; i < shortestPath.size() - 1; ++i) {
         for (const auto& path : shortestPath[i]->getPaths()) {
             if (path.getDestination() == shortestPath[i + 1]) {
@@ -97,24 +100,37 @@ void TravelAgency::startJourney(Passenger& passenger, const std::string& destina
                 break;
             }
         }
-    }
+    }  */
 
     // Exibe a lista de transportes disponíveis e solicita ao usuário que selecione um
-    addPassengerToTransport("", passenger);
+    std::string selectedTransportName;
+    addPassengerToTransport(selectedTransportName, passenger);
 
-    // Recolhe o transporte escolhido
+    // Verifica se o nome do transporte foi corretamente definido
+    if (selectedTransportName.empty()) {
+        std::cerr << "Nenhum transporte foi selecionado." << std::endl;
+        return;
+    }
+
+    // Recolhe o transporte escolhido usando o nome do transporte
     Transport* selectedTransport = nullptr;
-    auto it = transports.find(passenger.getName());
+    auto it = transports.find(selectedTransportName);
     if (it != transports.end()) {
         selectedTransport = &it->second;
     } else {
-        std::cerr << "Transporte não encontrado para o passageiro " << passenger.getName() << std::endl;
+        std::cerr << "Transporte " << selectedTransportName << " não encontrado." << std::endl;
         return;
     }
 
     // Verifica se o transporte está disponível
     if (!selectedTransport->isAvailable()) {
-        std::cerr << "Transporte não está disponível" << std::endl;
+        std::cerr << "Transporte " << selectedTransportName << " não está disponível" << std::endl;
+        return;
+    }
+    double totalDistance = dbManager.getPathDistance(currentLocation->getName(), destinationCity->getName());
+
+    if (totalDistance <= 0) {
+        std::cerr << "Distância inválida entre as cidades" << std::endl;
         return;
     }
 
@@ -139,8 +155,11 @@ void TravelAgency::startJourney(Passenger& passenger, const std::string& destina
     passenger.setCurrentLocation(destinationCity);
 
     // Atualiza o banco de dados, se necessário
-    std::string timestamp = getCurrentTimestamp(); // Obtém o timestamp atual
-    dbManager.saveTravel(selectedTransport->getId(), currentLocation->getId(), destinationCity->getId(), timestamp);
+    std::string starttimestamp = getCurrentTimestamp(); // Obtém o timestamp atual
+    dbManager.saveTravel(selectedTransport->getId(), currentLocation->getId(), destinationCity->getId(), starttimestamp);
 
     std::cout << "Viagem iniciada. Tempo estimado de viagem: " << travelTime << " horas." << std::endl;
+
+    std::string endTimestamp = getCurrentTimestamp();
+    dbManager.updateTravelEndTime(travelId, endTimestamp);
 }

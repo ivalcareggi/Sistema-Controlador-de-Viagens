@@ -12,6 +12,7 @@ class TravelRegister {
 private:
     TravelAgency& agency;  // Referência para a agência de viagens
     DatabaseManager& dbManager;  // Referência para o gerenciador do banco de dados
+    std::vector<Passenger> passengersList; 
 
 public:
     // Construtor que inicializa as referências para a agência e o banco de dados

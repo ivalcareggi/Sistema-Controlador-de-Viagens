@@ -36,10 +36,14 @@ public:
     std::vector<Transport> getAllTransports(); 
     Transport getTransportByName(const std::string& name) const;
     Path getPath(const City& origin, const City& destination); 
-    double getPathDistance(int originCityId, int destinationCityId); 
+   // double getPathDistance(int originCityId, int destinationCityId); 
+    double getPathDistance(const std::string& originCityName, const std::string& destinationCityName);
     int getTransportId(const std::string& transportName); 
     int getCityId(const std::string& cityName) const;
     std::string getPassengerName(const std::string& passengerName);
+    int getPassengerCityId(const std::string& passengerName) const; // verificar
+    City* findCityById(int cityId) const; //verificar
+    std::string getCityName(int cityId) const;
 
 private:
     sqlite3* db;

@@ -1,3 +1,4 @@
+
 #include "../include/TravelRegister.h"
 #include <iostream>
 #include <stdexcept>
@@ -142,5 +143,13 @@ Passenger* TravelRegister::findPassengerByName(const std::string& passengerName)
     if (name.empty()) {
         return nullptr;  // Passageiro não encontrado
     }
-    return new Passenger(name);  // Retorna um novo objeto Passenger
+
+    City* location = nullptr;
+    // Suponha que você tenha uma função para obter a localização do passageiro
+    int cityId = dbManager.getPassengerCityId(name);
+    if (cityId > 0) {
+        location = dbManager.findCityById(cityId);
+    }
+
+    return new Passenger(name, location);  // Retorna um novo objeto Passenger com a localização
 }
