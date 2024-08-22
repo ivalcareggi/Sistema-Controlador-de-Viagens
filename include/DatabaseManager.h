@@ -19,7 +19,7 @@ public:
     void savePath(const std::string& origin, const std::string& destination, double distance);
     void saveTransport(const std::string& transportName, int capacity, bool type);
     void savePassenger(const std::string& passengerName, const std::string& location); // continuar amanha
-    void saveTravel(int transportId, int originCityId, int destinationCityId, const std::string& timestamp);
+    int  saveTravel(int transportId, int originCityId, int destinationCityId, const std::string& timestamp);
     void updateTravelEndTime(int travelId, const std::string& endTime);
     void updatePassengerLocation(const std::string& name, int id);
 

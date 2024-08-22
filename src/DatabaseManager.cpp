@@ -170,33 +170,46 @@ void DatabaseManager::savePassenger(const std::string& passengerName, const std:
     executeSQL(query);
 }
 
-void DatabaseManager::saveTravel(int transportId, int originCityId, int destinationCityId, const std::string& startTime) {
+int DatabaseManager::saveTravel(int transportId, int originCityId, int destinationCityId, const std::string& timestamp) {
     std::string query = "INSERT INTO travels (transport_id, origin_id, destination_id, start_time) VALUES (?, ?, ?, ?);";
-
-    // Preparar e executar o comando SQL com parâmetros
     sqlite3_stmt* stmt;
-    sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
-    sqlite3_bind_int(stmt, 1, transportId);
-    sqlite3_bind_int(stmt, 2, originCityId);
-    sqlite3_bind_int(stmt, 3, destinationCityId);
-    sqlite3_bind_text(stmt, 4, startTime.c_str(), -1, SQLITE_STATIC);
-    
-    sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-}
+    int travelId = -1;
 
+    if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, transportId);
+        sqlite3_bind_int(stmt, 2, originCityId);
+        sqlite3_bind_int(stmt, 3, destinationCityId);
+        sqlite3_bind_text(stmt, 4, timestamp.c_str(), -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_DONE) {
+            travelId = sqlite3_last_insert_rowid(db); // Obtém o ID da última inserção
+        } else {
+            std::cerr << "Erro ao inserir viagem: " << sqlite3_errmsg(db) << std::endl;
+        }
+        sqlite3_finalize(stmt);
+    } else {
+        std::cerr << "Falha ao preparar a instrução SQL: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+    return travelId;
+}
 
 void DatabaseManager::updateTravelEndTime(int travelId, const std::string& endTime) {
     std::string query = "UPDATE travels SET end_time = ? WHERE id = ?;";
+    sqlite3_stmt* stmt;
 
     // Preparar e executar o comando SQL com parâmetros
-    sqlite3_stmt* stmt;
-    sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
-    sqlite3_bind_text(stmt, 1, endTime.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 2, travelId);
-    
-    sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
+    if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, endTime.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 2, travelId);
+        
+        if (sqlite3_step(stmt) != SQLITE_DONE) {
+            std::cerr << "Erro ao atualizar o tempo de fim da viagem: " << sqlite3_errmsg(db) << std::endl;
+        }
+        sqlite3_finalize(stmt);
+    } else {
+        std::cerr << "Falha ao preparar a instrução SQL: " << sqlite3_errmsg(db) << std::endl;
+    }
 }
 void DatabaseManager::listCities() const {
      sqlite3_stmt* stmt;
