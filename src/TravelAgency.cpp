@@ -122,11 +122,26 @@ void TravelAgency::startJourney(Passenger& passenger, const std::string& destina
         return;
     }
 
-    double totalDistance = dbManager.getPathDistance(currentLocation->getName(), destinationCity->getName());
+
+// Cálculo da distância total da rota
+for (size_t i = 0; i < shortestPath.size() - 1; ++i) {
+    for (const auto& path : shortestPath[i]->getPaths()) {
+        if (path.getDestination() == shortestPath[i + 1]) {
+            totalDistance += path.getDistance();
+            break;
+        }
+    }
+}
+
+// Verifica se a distância total foi calculada corretamente
+if (totalDistance <= 0) {
+    // Se não foi, tenta obter a distância pelo método alternativo
+    totalDistance = dbManager.getPathDistance(currentLocation->getName(), destinationCity->getName());
     if (totalDistance <= 0) {
         std::cerr << "Distância inválida entre as cidades" << std::endl;
         return;
     }
+}
 
     int speed, distRest, timeRest;
     std::cout << "Por favor, forneça a velocidade do transporte (km/h): ";
@@ -176,7 +191,7 @@ void TravelAgency::startJourney(Passenger& passenger, const std::string& destina
         elapsedTime += hoursToAdvance;
         currentTime += hoursToAdvance * 3600; // Avança o tempo em horas
 
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // Simulação de tempo
+        std::this_thread::sleep_for(std::chrono::seconds(1)); 
 
         if (elapsedTime >= travelTime) {
             elapsedTime = travelTime;
@@ -186,7 +201,9 @@ void TravelAgency::startJourney(Passenger& passenger, const std::string& destina
 
     std::string endTimestamp = getCurrentTimestamp();
     dbManager.updateTravelEndTime(travelId, endTimestamp);
+    dbManager.updatePassengerLocation(passenger.getName(), destinationCity->getId());
 
     selectedTransport->setAvailable(true);
     passenger.setPassengerOnRoute(false);
+    passenger.setCurrentLocation(destinationCity);
 }

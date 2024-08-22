@@ -683,15 +683,16 @@ int DatabaseManager::getCityId(const std::string& cityName) const {
     return cityName;
 }
 
-void DatabaseManager::updatePassengerLocation(const std::string& name, int id) {
+void DatabaseManager::updatePassengerLocation(const std::string& name, int cityId) {
     std::stringstream sql;
 
-    sql << "UPDATE travel_passengers as pas SET pas.city_id = " << id << "WHERE pas.name = '" << name << "';";
+    sql << "UPDATE travel_passengers SET city_id = " << cityId << " WHERE name = '" << name << "';";
+
+    // Adiciona uma mensagem de depuração para verificar se a função está sendo chamada
+    std::cout << "Atualizando localização do passageiro: " << name << " para a cidade com ID: " << cityId << std::endl;
 
     executeSQL(sql.str());
-
 }
-
 std::string DatabaseManager::getPassengerName(const std::string& passengerName) {
     sqlite3_stmt* stmt;
     std::string query = "SELECT name FROM travel_passengers WHERE name = ?";
