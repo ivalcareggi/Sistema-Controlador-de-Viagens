@@ -59,16 +59,16 @@ void TravelAgency::addPassengerToTransport(std::string& transportName, const Pas
         }
     } else {
         std::cout << "Transporte não encontrado.\n";
-        transportName.clear(); // Limpar o nome do transporte para indicar falha
+        transportName.clear(); 
     }
 }
 
 void TravelAgency::updatePassengerLocation(Passenger& passenger, City* newLocation) {
     if (newLocation != nullptr) {
-        // Atualiza a localização atual do passageiro
+        
         passenger.setCurrentLocation(newLocation);
 
-        // Atualiza a localização no banco de dados
+    
         dbManager.updatePassengerLocation(passenger.getName(), newLocation->getId());
     }
 }

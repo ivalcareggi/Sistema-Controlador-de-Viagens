@@ -9,7 +9,7 @@
 
 
 TravelArithmetic::TravelArithmetic() {
-    // Se necessário, adicione código de inicialização aqui
+    
 }
 
 // Calcula o tempo total de viagem, considerando pausas
@@ -47,7 +47,7 @@ std::vector<City*> TravelArithmetic::calculateShortestPath(const City& origin, c
         }
 
         if (currentCity == nullptr) {
-            break; // Se não houver cidade válida, saia do loop
+            break; 
         }
 
         // Remove a cidade atual dos não visitados
@@ -75,5 +75,7 @@ std::vector<City*> TravelArithmetic::calculateShortestPath(const City& origin, c
         }
     }
     std::reverse(path.begin(), path.end());
+
+    
     return path;
 }

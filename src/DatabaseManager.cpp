@@ -139,7 +139,7 @@ void DatabaseManager::logTrip(int travelId, const std::string& originCity, const
     sqlite3_finalize(stmt);
 }
 void DatabaseManager::updateTripStatus(int travelId, const std::string& status) {
-    std::string sql = "UPDATE travels SET status = ? WHERE id = ?";
+    std::string sql = "UPDATE trip_logs SET trip_status = ? WHERE travel_id = ?";
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
         sqlite3_bind_text(stmt, 1, status.c_str(), -1, SQLITE_STATIC);
@@ -157,7 +157,7 @@ void DatabaseManager::updateTripStatus(int travelId, const std::string& status) 
 
 void DatabaseManager::listOngoingTrips() {
     std::string sql = R"(
-        SELECT * FROM trip_logs WHERE trip_status = 'In Progress';
+        SELECT * FROM trip_logs WHERE trip_status = 'Em andamento';
     )";
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {

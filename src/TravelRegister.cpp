@@ -25,7 +25,7 @@ void TravelRegister::registerPath() {
     std::getline(std::cin, destination);
     std::cout << "Enter distance: ";
     std::cin >> distance;
-    std::cin.ignore();  // Clear newline character left in the input buffer
+    std::cin.ignore();  
     addPath(origin, destination, distance);
 }
 
@@ -115,7 +115,7 @@ void TravelRegister::printCityReport() const {
 // Lista todas as cidades
 void TravelRegister::listCities() const {
     std::vector<std::string> cityNames = dbManager.getAllCityNames();
-    std::cout << "List of Cities:\n";
+    std::cout << "Lista de cidades:\n";
     for (const auto& name : cityNames) {
         std::cout << name << "\n";
     }
@@ -147,7 +147,7 @@ Passenger* TravelRegister::findPassengerByName(const std::string& passengerName)
     }
 
     City* location = nullptr;
-    // Suponha que você tenha uma função para obter a localização do passageiro
+   
     int cityId = dbManager.getPassengerCityId(name);
     if (cityId > 0) {
         location = dbManager.findCityById(cityId);

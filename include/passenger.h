@@ -12,7 +12,7 @@ private:
     bool onRoute = false;       // Inicia como false até iniciar uma viagem
 
 public:
-    // Construtor com parâmetros para inicializar os atributos
+ 
     Passenger();  // Construtor padrão
     Passenger(const std::string& name, City* currentLocation);
     Passenger(const std::string& name, City& currentLocation); 

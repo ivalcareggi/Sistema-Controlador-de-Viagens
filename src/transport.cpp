@@ -96,7 +96,7 @@ void Transport::setCurrentLocation(City* location) {
 void Transport::addPassenger(const Passenger& passenger) {
     if (occupancy < capacity) {
         passengers.push_back(passenger);
-        ++occupancy;  // Atualizar a ocupação após adicionar o passageiro
+        ++occupancy;  
     }
 }
 void Transport::removePassenger(const Passenger& passenger) {

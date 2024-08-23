@@ -1,52 +1,33 @@
-# Definindo variáveis
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -O2
-LDFLAGS = -lsqlite3
+CC = g++
+CFLAGS = -Wall -std=c++17 -I/usr/include -Iinclude
+LDFLAGS = -L/usr/lib -lsqlite3
+SRC_DIR = src
+BIN_DIR = bin
+OBJ_DIR = obj
+TARGET = $(BIN_DIR)/main
 
-# Lista dos arquivos de fonte
-SRCS = main.cpp \
-       DatabaseManager.cpp \
-       TravelAgency.cpp \
-       TravelRegister.cpp \
-       TravelArithmetic.cpp \
-       transport.cpp \
-       path.cpp \
-       passenger.cpp \
-       city.cpp
+# Lista de arquivos-fonte
+SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 
-# Lista dos arquivos objeto correspondentes
-OBJS = $(SRCS:.cpp=.o)
-
-# Nome do executável
-TARGET = travel_management
+# Cria objetos dos cpp
+OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 # Regra padrão
 all: $(TARGET)
 
-# Regra para construir o executável
+# Criar executável
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) $(LDFLAGS) -o $(TARGET)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
-# Regra para construir arquivos objeto a partir de arquivos fonte
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Criar os arquivos objetos
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-# Regra para limpar arquivos gerados
+# Limpa arquivos gerados
 clean:
-	rm -f $(TARGET) $(OBJS)
+	rm -rf $(BIN_DIR) $(OBJ_DIR)
 
-# Regra para remover arquivos objeto e o executável
-distclean: clean
-
-# Regras de dependências
-main.o: TravelAgency.h DatabaseManager.h TravelRegister.h
-DatabaseManager.o: DatabaseManager.h city.h transport.h path.h passenger.h
-TravelAgency.o: TravelAgency.h DatabaseManager.h TravelRegister.h city.h transport.h path.h passenger.h
-TravelRegister.o: TravelRegister.h TravelAgency.h DatabaseManager.h city.h transport.h path.h passenger.h
-TravelArithmetic.o: TravelAgency.h TravelRegister.h DatabaseManager.h
-transport.o: transport.h passenger.h
-path.o: path.h city.h
-passenger.o: passenger.h city.h
-city.o: city.h
-
-.PHONY: all clean distclean
+# Instrução para executar o target default quando make é chamado sem argumentos
+.PHONY: all clean test

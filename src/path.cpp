@@ -18,7 +18,7 @@ double Path::getDistance() const {
     return distance;
 }
 
-// Definição do operador de comparação ==
+
 bool Path::operator==(const Path& other) const {
     return origin == other.origin &&
            destination == other.destination &&
