@@ -26,7 +26,7 @@ public:
 
     // Métodos auxiliares para adicionar dados
     void addCity(const std::string& cityName);
-    void addTransport(const std::string& transportName, int capacity, bool type);
+    void addTransport(const std::string& transportName, int capacity, bool type, int cityId);
     void addPassenger(const std::string& passengerName, const std::string& location);
     void addPath(const std::string& origin, const std::string& destination, double distance);
 

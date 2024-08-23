@@ -21,6 +21,7 @@ private:
     DatabaseManager dbManager;
     bool isFinished = false; // para saber se a viagem terminou, valor padrão false até o fim de alguma viagem, quando a variavel se torna true
     int travelId;
+    std::map<std::string, std::tuple<double, int, Passenger*>> ongoingTravels;
 
 public:
     TravelAgency(const DatabaseManager& db);
@@ -29,7 +30,8 @@ public:
     void addCity(const City& city);
     void addPassengerToTransport(std::string& transportName, const Passenger& passenger);
     void startJourney(Passenger& passenger, const std::string& destinationName);  
-    void endJourney(int travelId, Passenger& passenger);
+    void endJourney(Passenger& passenger, Transport& transport, int travelId);
+    void simulateTimeAdvance();
     std::vector<Passenger>& getPassengers();
     
 };

@@ -10,6 +10,7 @@
 TravelAgency::TravelAgency(const DatabaseManager& db) : dbManager(db) {}
 
 TravelAgency::~TravelAgency() {}
+std::map<std::string, std::tuple<double, int, Passenger*>> ongoingTravels;
 
 void TravelAgency::addCity(const City& city) {
     cities.push_back(city);
@@ -72,6 +73,7 @@ void TravelAgency::updatePassengerLocation(Passenger& passenger, City* newLocati
     }
 }
 
+
 void TravelAgency::startJourney(Passenger& passenger, const std::string& destinationName) {
     City* currentLocation = passenger.getCurrentLocation();
     if (!currentLocation) {
@@ -85,22 +87,7 @@ void TravelAgency::startJourney(Passenger& passenger, const std::string& destina
         return;
     }
 
-    // Calcula a melhor rota usando TravelArithmetic
-    std::vector<City*> shortestPath = travelArithmetic.calculateShortestPath(*currentLocation, *destinationCity, cities);
- 
-    // Calcula a distância total da rota
-    double totalDistance = 0.0;
-    for (size_t i = 0; i < shortestPath.size() - 1; ++i) {
-        for (const auto& path : shortestPath[i]->getPaths()) {
-            if (path.getDestination() == shortestPath[i + 1]) {
-                totalDistance += path.getDistance();
-                break;
-            }
-        }
-    }  
-
-    // Exibe a lista de transportes disponíveis e solicita ao usuário que selecione um
-  std::string selectedTransportName;
+    std::string selectedTransportName;
     addPassengerToTransport(selectedTransportName, passenger);
 
     if (selectedTransportName.empty()) {
@@ -122,26 +109,31 @@ void TravelAgency::startJourney(Passenger& passenger, const std::string& destina
         return;
     }
 
-
-// Cálculo da distância total da rota
-for (size_t i = 0; i < shortestPath.size() - 1; ++i) {
-    for (const auto& path : shortestPath[i]->getPaths()) {
-        if (path.getDestination() == shortestPath[i + 1]) {
-            totalDistance += path.getDistance();
-            break;
-        }
-    }
-}
-
-// Verifica se a distância total foi calculada corretamente
-if (totalDistance <= 0) {
-    // Se não foi, tenta obter a distância pelo método alternativo
-    totalDistance = dbManager.getPathDistance(currentLocation->getName(), destinationCity->getName());
-    if (totalDistance <= 0) {
-        std::cerr << "Distância inválida entre as cidades" << std::endl;
+    int transportCityId = dbManager.getTransportCityId(selectedTransport->getId());
+    if (transportCityId != currentLocation->getId()) {
+        std::cerr << "Transporte " << selectedTransportName << " não está na cidade de origem." << std::endl;
         return;
     }
-}
+
+    std::vector<City*> shortestPath = travelArithmetic.calculateShortestPath(*currentLocation, *destinationCity, cities);
+
+    double totalDistance = 0.0;
+    for (size_t i = 0; i < shortestPath.size() - 1; ++i) {
+        for (const auto& path : shortestPath[i]->getPaths()) {
+            if (path.getDestination() == shortestPath[i + 1]) {
+                totalDistance += path.getDistance();
+                break;
+            }
+        }
+    }
+
+    if (totalDistance <= 0) {
+        totalDistance = dbManager.getPathDistance(currentLocation->getName(), destinationCity->getName());
+        if (totalDistance <= 0) {
+            std::cerr << "Distância inválida entre as cidades" << std::endl;
+            return;
+        }
+    }
 
     int speed, distRest, timeRest;
     std::cout << "Por favor, forneça a velocidade do transporte (km/h): ";
@@ -156,17 +148,24 @@ if (totalDistance <= 0) {
 
     double travelTime = travelArithmetic.totalTravelTime(totalDistance, speed, distRest, timeRest);
     passenger.setPassengerOnRoute(true);
-    passenger.setCurrentLocation(destinationCity);
 
     std::string startTimestamp = getCurrentTimestamp();
     int travelId = dbManager.saveTravel(selectedTransport->getId(), currentLocation->getId(), destinationCity->getId(), startTimestamp);
 
+    ongoingTravels[selectedTransportName] = std::make_tuple(travelTime, travelId, &passenger);
+
+    dbManager.logTrip(travelId, currentLocation->getName(), destinationCity->getName(), passenger.getName(), "Em andamento");
+
     std::cout << "Viagem iniciada. Tempo estimado de viagem: " << travelTime << " horas." << std::endl;
 
-    std::time_t currentTime = std::time(nullptr); // Obtem o tempo atual
-    double elapsedTime = 0.0;
+    passenger.setCurrentLocation(destinationCity);
+}
 
-    while (elapsedTime < travelTime) {
+void TravelAgency::simulateTimeAdvance() {
+    double elapsedTime = 0.0;
+    std::time_t currentTime = std::time(nullptr);
+
+    while (true) {
         std::tm* localTime = std::localtime(&currentTime);
         std::cout << "Hora atual: " << std::put_time(localTime, "%H:%M") << std::endl;
 
@@ -176,7 +175,7 @@ if (totalDistance <= 0) {
         std::cin >> userInput;
 
         if (userInput == 'q') {
-            std::cout << "Viagem interrompida pelo usuário." << std::endl;
+            std::cout << "Simulação de avanço do tempo interrompida." << std::endl;
             break;
         } else if (userInput == 'a') {
             hoursToAdvance = 1;
@@ -189,21 +188,44 @@ if (totalDistance <= 0) {
         }
 
         elapsedTime += hoursToAdvance;
-        currentTime += hoursToAdvance * 3600; // Avança o tempo em horas
+        currentTime += hoursToAdvance * 3600;
 
-        std::this_thread::sleep_for(std::chrono::seconds(1)); 
+        std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        if (elapsedTime >= travelTime) {
-            elapsedTime = travelTime;
-            std::cout << "Chegada ao destino: " << destinationCity->getName() << std::endl;
+        for (auto& [transportName, transport] : transports) {
+            if (transport.isInTransit()) {
+                auto it = ongoingTravels.find(transportName);
+                if (it != ongoingTravels.end()) {
+                    double travelTime = std::get<0>(it->second);
+                    int travelId = std::get<1>(it->second);
+                    Passenger* passenger = std::get<2>(it->second);
+
+                    if (elapsedTime >= travelTime) {
+                        elapsedTime = travelTime;
+                        if (passenger) {
+                            endJourney(*passenger, transport, travelId);
+                            ongoingTravels.erase(it);
+                        }
+                    }
+                }
+            }
         }
     }
+}
 
+void TravelAgency::endJourney(Passenger& passenger, Transport& transport, int travelId) {
     std::string endTimestamp = getCurrentTimestamp();
     dbManager.updateTravelEndTime(travelId, endTimestamp);
-    dbManager.updatePassengerLocation(passenger.getName(), destinationCity->getId());
 
-    selectedTransport->setAvailable(true);
+    City* destinationCity = passenger.getCurrentLocation();
+    dbManager.updatePassengerLocation(passenger.getName(), destinationCity->getId());
+    dbManager.updateTransportLocation(transport.getId(), destinationCity->getId());
+
+    transport.setAvailable(true);
     passenger.setPassengerOnRoute(false);
-    passenger.setCurrentLocation(destinationCity);
+
+    
+    dbManager.updateTripStatus(travelId, "Finalizada");
+
+    std::cout << "Viagem finalizada. Chegada ao destino: " << destinationCity->getName() << std::endl;
 }

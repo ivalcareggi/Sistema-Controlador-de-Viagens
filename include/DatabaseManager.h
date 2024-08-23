@@ -17,11 +17,13 @@ public:
     // Métodos de salvamento
     void saveCity(const std::string& cityName);
     void savePath(const std::string& origin, const std::string& destination, double distance);
-    void saveTransport(const std::string& transportName, int capacity, bool type);
+    void saveTransport(const std::string& transportName, int capacity, bool type, int cityId);
     void savePassenger(const std::string& passengerName, const std::string& location); // continuar amanha
     int  saveTravel(int transportId, int originCityId, int destinationCityId, const std::string& timestamp);
     void updateTravelEndTime(int travelId, const std::string& endTime);
     void updatePassengerLocation(const std::string& name, int id);
+    void updateTransportLocation(int transportId, int cityId);
+    void updateTripStatus(int travelId, const std::string& status);
 
     // Métodos de listagem
     void listCities() const;
@@ -44,6 +46,10 @@ public:
     int getPassengerCityId(const std::string& passengerName) const; // verificar
     City* findCityById(int cityId) const; //verificar
     std::string getCityName(int cityId) const;
+    int getTransportCityId(int transportId);
+    void logTrip(int travelId, const std::string& originCity, const std::string& destinationCity, const std::string& passengers, const std::string& tripStatus); // verificar
+    void listOngoingTrips(); // verificar
+    void listMostVisitedCities(); // verificar
 
 private:
     sqlite3* db;

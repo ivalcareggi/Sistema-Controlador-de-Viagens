@@ -34,14 +34,17 @@ void TravelRegister::registerTransport() {
     std::string transportName;
     int capacity;
     bool type;
-    std::cout << "Enter transport name: ";
+    int cityId;
+    std::cout << "Insira o nome ";
     std::getline(std::cin, transportName);
-    std::cout << "Enter capacity: ";
+    std::cout << "Insira a capacidade ";
     std::cin >> capacity;
-    std::cout << "Enter type (1 for terrestrial, 0 for aquatic): ";
+    std::cout << "Insira o tipo (1 para terrestre, 0 for aquatico): ";
     std::cin >> type;
-    std::cin.ignore();  // Clear newline character left in the input buffer
-    addTransport(transportName, capacity, type);
+    std::cout << "Coloque o ID da cidade em que ele está localizado ";
+    std::cin >> cityId;
+    std::cin.ignore();  
+    addTransport(transportName, capacity, type, cityId);
 }
 
 // Método para registrar passageiros
@@ -60,10 +63,9 @@ void TravelRegister::addCity(const std::string& cityName) {
 }
 
 // Adiciona um transporte ao banco de dados
-void TravelRegister::addTransport(const std::string& transportName, int capacity, bool type) {
-    dbManager.saveTransport(transportName, capacity, type);
+void TravelRegister::addTransport(const std::string& transportName, int capacity, bool type, int cityId) {
+    dbManager.saveTransport(transportName, capacity, type, cityId);
 }
-
 // Adiciona um passageiro ao banco de dados
 void TravelRegister::addPassenger(const std::string& passengerName, const std::string& location) {
     dbManager.savePassenger(passengerName, location);
